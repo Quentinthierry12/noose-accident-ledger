@@ -1516,6 +1516,72 @@ export type Database = {
         }
         Relationships: []
       }
+      noose_accidents: {
+        Row: {
+          added_by: string
+          cost: number
+          created_at: string
+          date: string
+          description: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          added_by: string
+          cost?: number
+          created_at?: string
+          date?: string
+          description: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          added_by?: string
+          cost?: number
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      noose_colleague_profile: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          nickname: string | null
+          photo_url: string | null
+          surname: string
+          total_accidents: number
+          total_cost: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          nickname?: string | null
+          photo_url?: string | null
+          surname: string
+          total_accidents?: number
+          total_cost?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          nickname?: string | null
+          photo_url?: string | null
+          surname?: string
+          total_accidents?: number
+          total_cost?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -18,6 +18,9 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        // NOOSE Military variants
+        military: "bg-noose-blue text-white border border-noose-blue/20 shadow-md hover:bg-noose-accent transition-all duration-300",
+        alert: "bg-alert-red text-white border border-alert-red/20 shadow-md hover:bg-alert-red/90 animate-pulse",
       },
       size: {
         default: "h-10 px-4 py-2",
