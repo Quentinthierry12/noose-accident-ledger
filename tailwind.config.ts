@@ -52,6 +52,12 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// NOOSE specific colors
+				'noose-blue': 'hsl(var(--noose-blue))',
+				'noose-light-blue': 'hsl(var(--noose-light-blue))',
+				'noose-accent': 'hsl(var(--noose-accent))',
+				'alert-red': 'hsl(var(--alert-red))',
+				'money-green': 'hsl(var(--money-green))',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
