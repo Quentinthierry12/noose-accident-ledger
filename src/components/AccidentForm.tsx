@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Calendar, FileText, DollarSign, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,9 +13,16 @@ interface AccidentFormProps {
   onAccidentAdded: () => void;
 }
 
+interface Agent {
+  id: string;
+  name: string;
+  agent_number: number;
+}
+
 export const AccidentForm = ({ onAccidentAdded }: AccidentFormProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [agents, setAgents] = useState<Agent[]>([]);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -22,7 +30,26 @@ export const AccidentForm = ({ onAccidentAdded }: AccidentFormProps) => {
     description: "",
     cost: "",
     added_by: "",
+    agent_id: "",
   });
+
+  useEffect(() => {
+    fetchAgents();
+  }, []);
+
+  const fetchAgents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('noose_agents')
+        .select('id, name, agent_number')
+        .order('agent_number', { ascending: true });
+
+      if (error) throw error;
+      setAgents(data || []);
+    } catch (error) {
+      console.error('Erreur lors du chargement des agents:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +73,7 @@ export const AccidentForm = ({ onAccidentAdded }: AccidentFormProps) => {
           description: formData.description,
           cost: parseFloat(formData.cost) || 0,
           added_by: formData.added_by,
+          agent_id: formData.agent_id || null,
         });
 
       if (error) throw error;
@@ -61,6 +89,7 @@ export const AccidentForm = ({ onAccidentAdded }: AccidentFormProps) => {
         description: "",
         cost: "",
         added_by: "",
+        agent_id: "",
       });
 
       setIsOpen(false);
@@ -150,6 +179,28 @@ export const AccidentForm = ({ onAccidentAdded }: AccidentFormProps) => {
               className="border-noose-blue/20 min-h-[100px]"
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="agent" className="flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Agent Impliqué (Optionnel)
+            </Label>
+            <Select 
+              value={formData.agent_id} 
+              onValueChange={(value) => setFormData({ ...formData, agent_id: value })}
+            >
+              <SelectTrigger className="border-noose-blue/20">
+                <SelectValue placeholder="Sélectionner un agent..." />
+              </SelectTrigger>
+              <SelectContent>
+                {agents.map((agent) => (
+                  <SelectItem key={agent.id} value={agent.id}>
+                    {agent.name} (Agent #{agent.agent_number})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

@@ -3,6 +3,9 @@ import { NooseHeader } from "@/components/NooseHeader";
 import { ColleagueProfile } from "@/components/ColleagueProfile";
 import { AccidentForm } from "@/components/AccidentForm";
 import { AccidentsList } from "@/components/AccidentsList";
+import { AgentsList } from "@/components/AgentsList";
+import { DailyQuote } from "@/components/DailyQuote";
+import { CustomPopup } from "@/components/CustomPopup";
 
 const Index = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -16,12 +19,18 @@ const Index = () => {
       <NooseHeader />
       
       <main className="container mx-auto px-4 py-8 space-y-8">
+        <DailyQuote />
+        
         <ColleagueProfile />
         
         <AccidentForm onAccidentAdded={handleAccidentAdded} />
         
+        <AgentsList refreshTrigger={refreshTrigger} />
+        
         <AccidentsList refreshTrigger={refreshTrigger} />
       </main>
+      
+      <CustomPopup />
       
       {/* Footer */}
       <footer className="mt-16 py-6 bg-noose-blue/10 border-t border-noose-blue/20">

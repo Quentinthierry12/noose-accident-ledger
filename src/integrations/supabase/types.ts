@@ -1519,6 +1519,7 @@ export type Database = {
       noose_accidents: {
         Row: {
           added_by: string
+          agent_id: string | null
           cost: number
           created_at: string
           date: string
@@ -1528,6 +1529,7 @@ export type Database = {
         }
         Insert: {
           added_by: string
+          agent_id?: string | null
           cost?: number
           created_at?: string
           date?: string
@@ -1537,12 +1539,51 @@ export type Database = {
         }
         Update: {
           added_by?: string
+          agent_id?: string | null
           cost?: number
           created_at?: string
           date?: string
           description?: string
           id?: string
           updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "noose_accidents_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "noose_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      noose_agents: {
+        Row: {
+          agent_number: number
+          created_at: string | null
+          id: string
+          name: string
+          total_accidents: number | null
+          total_cost: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          agent_number?: number
+          created_at?: string | null
+          id?: string
+          name: string
+          total_accidents?: number | null
+          total_cost?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          agent_number?: number
+          created_at?: string | null
+          id?: string
+          name?: string
+          total_accidents?: number | null
+          total_cost?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -1578,6 +1619,66 @@ export type Database = {
           surname?: string
           total_accidents?: number
           total_cost?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      noose_custom_popups: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          image_url: string | null
+          is_active: boolean
+          redirect_url: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          redirect_url: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          redirect_url?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      noose_daily_quotes: {
+        Row: {
+          author: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          quote: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          quote: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          quote?: string
           updated_at?: string
         }
         Relationships: []
