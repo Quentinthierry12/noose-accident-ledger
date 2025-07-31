@@ -3,18 +3,16 @@ import { User, AlertCircle, DollarSign, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 
-interface ColleagueProfile {
+interface AgentProfile {
   id: string;
   name: string;
-  surname: string;
-  nickname: string | null;
-  photo_url: string | null;
+  agent_number: number;
   total_accidents: number;
   total_cost: number;
 }
 
 export const ColleagueProfile = () => {
-  const [profile, setProfile] = useState<ColleagueProfile | null>(null);
+  const [profile, setProfile] = useState<AgentProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   const randomQuotes = [
@@ -36,13 +34,17 @@ export const ColleagueProfile = () => {
   const fetchProfile = async () => {
     try {
       const { data, error } = await supabase
-        .from("noose_colleague_profile")
+        .from("noose_agents")
         .select("*")
-        .limit(1)
-        .single();
+        .order('agent_number', { ascending: true });
 
       if (error) throw error;
-      setProfile(data);
+      
+      if (data && data.length > 0) {
+        // Sélectionner un agent aléatoire
+        const randomIndex = Math.floor(Math.random() * data.length);
+        setProfile(data[randomIndex]);
+      }
     } catch (error) {
       console.error("Erreur lors du chargement du profil:", error);
     } finally {
@@ -79,31 +81,21 @@ export const ColleagueProfile = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Photo et infos de base */}
-          <div className="flex flex-col items-center lg:items-start">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-noose-blue to-noose-accent flex items-center justify-center mb-4 shadow-lg">
-              {profile.photo_url ? (
-                <img 
-                  src={profile.photo_url} 
-                  alt={`${profile.name} ${profile.surname}`}
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                <User className="w-16 h-16 text-white" />
-              )}
-            </div>
-            <div className="text-center lg:text-left">
-              <h2 className="text-2xl font-bold text-noose-blue">
-                {profile.name} {profile.surname}
-              </h2>
-              {profile.nickname && (
-                <p className="text-lg text-muted-foreground italic">
-                  &quot;{profile.nickname}&quot;
-                </p>
-              )}
-            </div>
-          </div>
+         <div className="flex flex-col lg:flex-row gap-6">
+           {/* Photo et infos de base */}
+           <div className="flex flex-col items-center lg:items-start">
+             <div className="w-32 h-32 rounded-full bg-gradient-to-br from-noose-blue to-noose-accent flex items-center justify-center mb-4 shadow-lg">
+               <User className="w-16 h-16 text-white" />
+             </div>
+             <div className="text-center lg:text-left">
+               <h2 className="text-2xl font-bold text-noose-blue">
+                 {profile.name}
+               </h2>
+               <p className="text-lg text-muted-foreground">
+                 Agent #{profile.agent_number}
+               </p>
+             </div>
+           </div>
 
           {/* Statistiques */}
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
