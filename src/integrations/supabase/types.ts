@@ -1213,6 +1213,48 @@ export type Database = {
           },
         ]
       }
+      dhs_specialty_uniforms: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          specialty_id: string
+          uniform_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          specialty_id: string
+          uniform_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          specialty_id?: string
+          uniform_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dhs_specialty_uniforms_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "dhs_specialties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dhs_specialty_uniforms_uniform_id_fkey"
+            columns: ["uniform_id"]
+            isOneToOne: false
+            referencedRelation: "dhs_uniforms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dhs_sub_module_appreciations: {
         Row: {
           appreciation: string | null
@@ -1518,6 +1560,7 @@ export type Database = {
       }
       noose_accidents: {
         Row: {
+          accident_type: string
           added_by: string
           agent_id: string | null
           cost: number
@@ -1526,8 +1569,10 @@ export type Database = {
           description: string
           id: string
           updated_at: string
+          video_url: string | null
         }
         Insert: {
+          accident_type?: string
           added_by: string
           agent_id?: string | null
           cost?: number
@@ -1536,8 +1581,10 @@ export type Database = {
           description: string
           id?: string
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
+          accident_type?: string
           added_by?: string
           agent_id?: string | null
           cost?: number
@@ -1546,6 +1593,7 @@ export type Database = {
           description?: string
           id?: string
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: [
           {

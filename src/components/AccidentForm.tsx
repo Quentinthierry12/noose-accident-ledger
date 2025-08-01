@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Calendar, FileText, DollarSign, User, Video } from "lucide-react";
+import { Plus, Calendar, FileText, DollarSign, User, Video, Car } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,7 @@ export const AccidentForm = ({ onAccidentAdded }: AccidentFormProps) => {
     added_by: "",
     agent_id: "",
     video_url: "",
+    accident_type: "autre",
   });
 
   useEffect(() => {
@@ -75,6 +76,7 @@ export const AccidentForm = ({ onAccidentAdded }: AccidentFormProps) => {
           cost: parseFloat(formData.cost) || 0,
           added_by: formData.added_by,
           agent_id: formData.agent_id || null,
+          accident_type: formData.accident_type,
         });
 
       if (error) throw error;
@@ -92,6 +94,7 @@ export const AccidentForm = ({ onAccidentAdded }: AccidentFormProps) => {
         added_by: "",
         agent_id: "",
         video_url: "",
+        accident_type: "autre",
       });
 
       setIsOpen(false);
@@ -181,6 +184,28 @@ export const AccidentForm = ({ onAccidentAdded }: AccidentFormProps) => {
               className="border-noose-blue/20 min-h-[100px]"
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="accident_type" className="flex items-center gap-2">
+              <Car className="w-4 h-4" />
+              Type d&apos;accident *
+            </Label>
+            <Select 
+              value={formData.accident_type} 
+              onValueChange={(value) => setFormData({ ...formData, accident_type: value })}
+            >
+              <SelectTrigger className="border-noose-blue/20">
+                <SelectValue placeholder="Sélectionner un type..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="bateau">🚤 Bateau</SelectItem>
+                <SelectItem value="voiture">🚗 Voiture</SelectItem>
+                <SelectItem value="avion">✈️ Avion</SelectItem>
+                <SelectItem value="moto">🏍️ Moto</SelectItem>
+                <SelectItem value="autre">🔧 Autre</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

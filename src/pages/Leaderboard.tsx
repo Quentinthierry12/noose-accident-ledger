@@ -12,6 +12,13 @@ interface AgentStats {
   total_accidents: number;
   total_cost: number;
   combined_score: number;
+  accidents_by_type: {
+    bateau: number;
+    voiture: number;
+    avion: number;
+    moto: number;
+    autre: number;
+  };
 }
 
 const Leaderboard = () => {
@@ -31,12 +38,31 @@ const Leaderboard = () => {
 
       if (error) throw error;
 
-      const statsWithCombinedScore = agents?.map(agent => ({
-        ...agent,
-        combined_score: agent.total_accidents * Number(agent.total_cost)
-      })) || [];
+      // Récupérer les accidents par type pour chaque agent
+      const agentsWithTypeStats = await Promise.all(
+        (agents || []).map(async (agent) => {
+          const { data: accidents } = await supabase
+            .from('noose_accidents')
+            .select('accident_type')
+            .eq('agent_id', agent.id);
 
-      setAgentStats(statsWithCombinedScore);
+          const accidents_by_type = {
+            bateau: accidents?.filter(a => a.accident_type === 'bateau').length || 0,
+            voiture: accidents?.filter(a => a.accident_type === 'voiture').length || 0,
+            avion: accidents?.filter(a => a.accident_type === 'avion').length || 0,
+            moto: accidents?.filter(a => a.accident_type === 'moto').length || 0,
+            autre: accidents?.filter(a => a.accident_type === 'autre').length || 0,
+          };
+
+          return {
+            ...agent,
+            combined_score: agent.total_accidents * Number(agent.total_cost),
+            accidents_by_type,
+          };
+        })
+      );
+
+      setAgentStats(agentsWithTypeStats);
     } catch (error) {
       console.error('Erreur lors du chargement des statistiques:', error);
     } finally {
@@ -54,6 +80,13 @@ const Leaderboard = () => {
 
   const getTopAgentsByCombinedScore = () => {
     return [...agentStats].sort((a, b) => b.combined_score - a.combined_score).slice(0, 10);
+  };
+
+  const getTopAgentsByType = (type: keyof AgentStats['accidents_by_type']) => {
+    return [...agentStats]
+      .filter(agent => agent.accidents_by_type[type] > 0)
+      .sort((a, b) => b.accidents_by_type[type] - a.accidents_by_type[type])
+      .slice(0, 5);
   };
 
   const formatCurrency = (amount: number) => {
@@ -193,6 +226,143 @@ const Leaderboard = () => {
               ))}
             </CardContent>
           </Card>
+        </div>
+
+        {/* Palmarès par Type d'Accident */}
+        <div className="mt-8">
+          <h2 className="text-3xl font-bold text-noose-blue mb-6 text-center">🏆 Palmarès par Type d'Accident</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Accidents Bateau */}
+            <Card className="border-blue-500/20 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-blue-500/10 to-blue-500/5">
+                <CardTitle className="flex items-center gap-2 text-blue-600">
+                  🚤 Accidents Bateau
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-4">
+                {getTopAgentsByType('bateau').map((agent, index) => (
+                  <div key={agent.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <Badge className={getRankBadgeColor(index + 1)}>#{index + 1}</Badge>
+                      <div>
+                        <p className="font-medium text-sm">{agent.name}</p>
+                        <p className="text-xs text-muted-foreground">Agent #{agent.agent_number}</p>
+                      </div>
+                    </div>
+                    <p className="text-lg font-bold text-blue-600">{agent.accidents_by_type.bateau}</p>
+                  </div>
+                ))}
+                {getTopAgentsByType('bateau').length === 0 && (
+                  <p className="text-center text-muted-foreground text-sm py-4">Aucun accident bateau</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Accidents Voiture */}
+            <Card className="border-red-500/20 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-red-500/10 to-red-500/5">
+                <CardTitle className="flex items-center gap-2 text-red-600">
+                  🚗 Accidents Voiture
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-4">
+                {getTopAgentsByType('voiture').map((agent, index) => (
+                  <div key={agent.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <Badge className={getRankBadgeColor(index + 1)}>#{index + 1}</Badge>
+                      <div>
+                        <p className="font-medium text-sm">{agent.name}</p>
+                        <p className="text-xs text-muted-foreground">Agent #{agent.agent_number}</p>
+                      </div>
+                    </div>
+                    <p className="text-lg font-bold text-red-600">{agent.accidents_by_type.voiture}</p>
+                  </div>
+                ))}
+                {getTopAgentsByType('voiture').length === 0 && (
+                  <p className="text-center text-muted-foreground text-sm py-4">Aucun accident voiture</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Accidents Avion */}
+            <Card className="border-green-500/20 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-green-500/10 to-green-500/5">
+                <CardTitle className="flex items-center gap-2 text-green-600">
+                  ✈️ Accidents Avion
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-4">
+                {getTopAgentsByType('avion').map((agent, index) => (
+                  <div key={agent.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <Badge className={getRankBadgeColor(index + 1)}>#{index + 1}</Badge>
+                      <div>
+                        <p className="font-medium text-sm">{agent.name}</p>
+                        <p className="text-xs text-muted-foreground">Agent #{agent.agent_number}</p>
+                      </div>
+                    </div>
+                    <p className="text-lg font-bold text-green-600">{agent.accidents_by_type.avion}</p>
+                  </div>
+                ))}
+                {getTopAgentsByType('avion').length === 0 && (
+                  <p className="text-center text-muted-foreground text-sm py-4">Aucun accident avion</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Accidents Moto */}
+            <Card className="border-orange-500/20 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-orange-500/10 to-orange-500/5">
+                <CardTitle className="flex items-center gap-2 text-orange-600">
+                  🏍️ Accidents Moto
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-4">
+                {getTopAgentsByType('moto').map((agent, index) => (
+                  <div key={agent.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <Badge className={getRankBadgeColor(index + 1)}>#{index + 1}</Badge>
+                      <div>
+                        <p className="font-medium text-sm">{agent.name}</p>
+                        <p className="text-xs text-muted-foreground">Agent #{agent.agent_number}</p>
+                      </div>
+                    </div>
+                    <p className="text-lg font-bold text-orange-600">{agent.accidents_by_type.moto}</p>
+                  </div>
+                ))}
+                {getTopAgentsByType('moto').length === 0 && (
+                  <p className="text-center text-muted-foreground text-sm py-4">Aucun accident moto</p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Autres Accidents */}
+            <Card className="border-purple-500/20 shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-purple-500/10 to-purple-500/5">
+                <CardTitle className="flex items-center gap-2 text-purple-600">
+                  🔧 Autres Accidents
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-4">
+                {getTopAgentsByType('autre').map((agent, index) => (
+                  <div key={agent.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <Badge className={getRankBadgeColor(index + 1)}>#{index + 1}</Badge>
+                      <div>
+                        <p className="font-medium text-sm">{agent.name}</p>
+                        <p className="text-xs text-muted-foreground">Agent #{agent.agent_number}</p>
+                      </div>
+                    </div>
+                    <p className="text-lg font-bold text-purple-600">{agent.accidents_by_type.autre}</p>
+                  </div>
+                ))}
+                {getTopAgentsByType('autre').length === 0 && (
+                  <p className="text-center text-muted-foreground text-sm py-4">Aucun autre accident</p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* Statistics Summary */}
