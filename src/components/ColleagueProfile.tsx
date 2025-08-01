@@ -11,24 +11,20 @@ interface AgentProfile {
   total_cost: number;
 }
 
+interface DailyQuote {
+  id: string;
+  quote: string;
+  author: string | null;
+}
+
 export const ColleagueProfile = () => {
   const [profile, setProfile] = useState<AgentProfile | null>(null);
+  const [quote, setQuote] = useState<DailyQuote | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const randomQuotes = [
-    "Ce collègue est un danger public.",
-    "Chaque jour sans incident est une victoire.",
-    "Sponsor officiel de la casse automobile.",
-    "Le budget annuel vient d'exploser.",
-    "Catastrophe ambulante certifiée NOOSE.",
-    "Formation anti-accident requise d'urgence.",
-    "Assurance responsabilité civile recommandée.",
-  ];
-
-  const randomQuote = randomQuotes[Math.floor(Math.random() * randomQuotes.length)];
 
   useEffect(() => {
     fetchProfile();
+    fetchQuote();
   }, []);
 
   const fetchProfile = async () => {
@@ -49,6 +45,25 @@ export const ColleagueProfile = () => {
       console.error("Erreur lors du chargement du profil:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchQuote = async () => {
+    try {
+      const { data: quotes, error } = await supabase
+        .from('noose_daily_quotes')
+        .select('*')
+        .eq('is_active', true);
+
+      if (error) throw error;
+
+      if (quotes && quotes.length > 0) {
+        // Sélectionner une citation aléatoire
+        const randomIndex = Math.floor(Math.random() * quotes.length);
+        setQuote(quotes[randomIndex]);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement de la citation:', error);
     }
   };
 
@@ -122,15 +137,22 @@ export const ColleagueProfile = () => {
         </div>
 
         {/* Citation humoristique */}
-        <div className="mt-6 p-4 bg-noose-light-blue/10 rounded-lg border border-noose-blue/20">
-          <div className="flex items-center gap-2 mb-2">
-            <Calendar className="w-5 h-5 text-noose-blue" />
-            <span className="text-sm font-medium text-noose-blue">Citation du jour</span>
+        {quote && (
+          <div className="mt-6 p-4 bg-noose-light-blue/10 rounded-lg border border-noose-blue/20">
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="w-5 h-5 text-noose-blue" />
+              <span className="text-sm font-medium text-noose-blue">Citation du jour</span>
+            </div>
+            <p className="text-lg italic text-noose-blue font-medium">
+              &quot;{quote.quote}&quot;
+            </p>
+            {quote.author && (
+              <p className="text-sm text-muted-foreground mt-2">
+                — {quote.author}
+              </p>
+            )}
           </div>
-          <p className="text-lg italic text-noose-blue font-medium">
-            &quot;{randomQuote}&quot;
-          </p>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

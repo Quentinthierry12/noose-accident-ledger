@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Calendar, FileText, DollarSign, User } from "lucide-react";
+import { Plus, Calendar, FileText, DollarSign, User, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -31,6 +31,7 @@ export const AccidentForm = ({ onAccidentAdded }: AccidentFormProps) => {
     cost: "",
     added_by: "",
     agent_id: "",
+    video_url: "",
   });
 
   useEffect(() => {
@@ -90,6 +91,7 @@ export const AccidentForm = ({ onAccidentAdded }: AccidentFormProps) => {
         cost: "",
         added_by: "",
         agent_id: "",
+        video_url: "",
       });
 
       setIsOpen(false);
@@ -201,6 +203,21 @@ export const AccidentForm = ({ onAccidentAdded }: AccidentFormProps) => {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="video_url" className="flex items-center gap-2">
+              <Video className="w-4 h-4" />
+              Lien Clip Vidéo (Optionnel)
+            </Label>
+            <Input
+              id="video_url"
+              type="url"
+              placeholder="https://example.com/video.mp4"
+              value={formData.video_url}
+              onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+              className="border-noose-blue/20"
+            />
           </div>
 
           <div className="space-y-2">
